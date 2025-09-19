@@ -27,7 +27,7 @@ import ai.timefold.solver.core.config.localsearch.decider.forager.LocalSearchFor
 import ai.timefold.solver.core.config.localsearch.decider.forager.LocalSearchPickEarlyType;
 import ai.timefold.solver.core.config.solver.PreviewFeature;
 import ai.timefold.solver.core.config.util.ConfigUtils;
-import ai.timefold.solver.core.enterprise.TimefoldSolverEnterpriseService;
+import ai.timefold.solver.core.extension.TimefoldSolverExtensionService;
 import ai.timefold.solver.core.impl.domain.entity.descriptor.EntityDescriptor;
 import ai.timefold.solver.core.impl.heuristic.HeuristicConfigPolicy;
 import ai.timefold.solver.core.impl.heuristic.selector.move.AbstractMoveSelectorFactory;
@@ -156,7 +156,7 @@ public class DefaultLocalSearchPhaseFactory<Solution_> extends AbstractPhaseFact
         var environmentMode = configPolicy.getEnvironmentMode();
         var decider = moveThreadCount == null
                 ? new LocalSearchDecider<>(configPolicy.getLogIndentation(), termination, moveRepository, acceptor, forager)
-                : TimefoldSolverEnterpriseService.loadOrFail(TimefoldSolverEnterpriseService.Feature.MULTITHREADED_SOLVING)
+                : TimefoldSolverExtensionService.load()
                         .buildLocalSearch(moveThreadCount, termination, moveRepository, acceptor, forager, environmentMode,
                                 configPolicy);
         decider.enableAssertions(environmentMode);

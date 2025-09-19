@@ -13,7 +13,7 @@ import ai.timefold.solver.core.config.heuristic.selector.common.decorator.Select
 import ai.timefold.solver.core.config.heuristic.selector.common.nearby.NearbySelectionConfig;
 import ai.timefold.solver.core.config.heuristic.selector.entity.EntitySelectorConfig;
 import ai.timefold.solver.core.config.heuristic.selector.value.ValueSelectorConfig;
-import ai.timefold.solver.core.enterprise.TimefoldSolverEnterpriseService;
+import ai.timefold.solver.core.extension.TimefoldSolverExtensionService;
 import ai.timefold.solver.core.impl.domain.entity.descriptor.EntityDescriptor;
 import ai.timefold.solver.core.impl.heuristic.HeuristicConfigPolicy;
 import ai.timefold.solver.core.impl.heuristic.selector.AbstractSelectorFactory;
@@ -235,7 +235,7 @@ public class EntitySelectorFactory<Solution_> extends AbstractSelectorFactory<So
     private EntitySelector<Solution_> applyNearbySelection(HeuristicConfigPolicy<Solution_> configPolicy,
             NearbySelectionConfig nearbySelectionConfig, SelectionCacheType minimumCacheType,
             SelectionOrder resolvedSelectionOrder, EntitySelector<Solution_> entitySelector) {
-        return TimefoldSolverEnterpriseService.loadOrFail(TimefoldSolverEnterpriseService.Feature.NEARBY_SELECTION)
+        return TimefoldSolverExtensionService.load()
                 .applyNearbySelection(config, configPolicy, nearbySelectionConfig, minimumCacheType,
                         resolvedSelectionOrder, entitySelector);
     }

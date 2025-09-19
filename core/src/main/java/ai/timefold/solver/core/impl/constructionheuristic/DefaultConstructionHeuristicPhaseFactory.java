@@ -18,7 +18,7 @@ import ai.timefold.solver.core.config.heuristic.selector.move.composite.UnionMov
 import ai.timefold.solver.core.config.heuristic.selector.move.generic.list.ListChangeMoveSelectorConfig;
 import ai.timefold.solver.core.config.heuristic.selector.value.ValueSelectorConfig;
 import ai.timefold.solver.core.config.util.ConfigUtils;
-import ai.timefold.solver.core.enterprise.TimefoldSolverEnterpriseService;
+import ai.timefold.solver.core.extension.TimefoldSolverExtensionService;
 import ai.timefold.solver.core.impl.constructionheuristic.DefaultConstructionHeuristicPhase.DefaultConstructionHeuristicPhaseBuilder;
 import ai.timefold.solver.core.impl.constructionheuristic.decider.ConstructionHeuristicDecider;
 import ai.timefold.solver.core.impl.constructionheuristic.decider.forager.ConstructionHeuristicForager;
@@ -173,7 +173,7 @@ public class DefaultConstructionHeuristicPhaseFactory<Solution_>
         var moveThreadCount = configPolicy.getMoveThreadCount();
         var decider = (moveThreadCount == null)
                 ? new ConstructionHeuristicDecider<>(configPolicy.getLogIndentation(), termination, forager)
-                : TimefoldSolverEnterpriseService.loadOrFail(TimefoldSolverEnterpriseService.Feature.MULTITHREADED_SOLVING)
+                : TimefoldSolverExtensionService.load()
                         .buildConstructionHeuristic(termination, forager, configPolicy);
         decider.enableAssertions(configPolicy.getEnvironmentMode());
         return decider;

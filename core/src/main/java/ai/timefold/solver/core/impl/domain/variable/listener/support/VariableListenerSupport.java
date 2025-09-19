@@ -18,7 +18,7 @@ import java.util.function.IntFunction;
 
 import ai.timefold.solver.core.api.domain.solution.PlanningSolution;
 import ai.timefold.solver.core.api.score.director.ScoreDirector;
-import ai.timefold.solver.core.enterprise.TimefoldSolverEnterpriseService;
+import ai.timefold.solver.core.extension.TimefoldSolverExtensionService;
 import ai.timefold.solver.core.impl.domain.entity.descriptor.EntityDescriptor;
 import ai.timefold.solver.core.impl.domain.variable.ListVariableStateSupply;
 import ai.timefold.solver.core.impl.domain.variable.cascade.CascadingUpdateShadowVariableDescriptor;
@@ -56,7 +56,7 @@ public final class VariableListenerSupport<Solution_> implements SupplyManager {
 
     public static <Solution_> VariableListenerSupport<Solution_> create(InnerScoreDirector<Solution_, ?> scoreDirector) {
         return new VariableListenerSupport<>(scoreDirector, new NotifiableRegistry<>(scoreDirector.getSolutionDescriptor()),
-                TimefoldSolverEnterpriseService.buildOrDefault(service -> service::buildTopologyGraph,
+                TimefoldSolverExtensionService.buildOrDefault(service -> service::buildTopologyGraph,
                         () -> DefaultTopologicalOrderGraph::new));
     }
 
