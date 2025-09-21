@@ -6,7 +6,7 @@ import ai.timefold.solver.core.config.heuristic.selector.common.SelectionCacheTy
 import ai.timefold.solver.core.config.heuristic.selector.common.SelectionOrder;
 import ai.timefold.solver.core.config.heuristic.selector.common.nearby.NearbySelectionConfig;
 import ai.timefold.solver.core.config.heuristic.selector.list.DestinationSelectorConfig;
-import ai.timefold.solver.core.enterprise.TimefoldSolverEnterpriseService;
+import ai.timefold.solver.core.extension.TimefoldSolverExtensionService;
 import ai.timefold.solver.core.impl.domain.entity.descriptor.EntityDescriptor;
 import ai.timefold.solver.core.impl.heuristic.HeuristicConfigPolicy;
 import ai.timefold.solver.core.impl.heuristic.selector.AbstractSelectorFactory;
@@ -96,11 +96,11 @@ public final class DestinationSelectorFactory<Solution_> extends AbstractSelecto
             var updatedDestinationSelector =
                     new ElementDestinationSelector<>(entitySelector, (IterableValueSelector<Solution_>) valueSelector,
                             selectionOrder.toRandomSelectionBoolean());
-            return TimefoldSolverEnterpriseService.loadOrFail(TimefoldSolverEnterpriseService.Feature.NEARBY_SELECTION)
+            return TimefoldSolverExtensionService.load()
                     .applyNearbySelection(config, configPolicy, minimumCacheType, selectionOrder,
                             updatedDestinationSelector);
         } else {
-            return TimefoldSolverEnterpriseService.loadOrFail(TimefoldSolverEnterpriseService.Feature.NEARBY_SELECTION)
+            return TimefoldSolverExtensionService.load()
                     .applyNearbySelection(config, configPolicy, minimumCacheType, selectionOrder, destinationSelector);
         }
     }

@@ -9,7 +9,7 @@ import ai.timefold.solver.core.api.score.stream.ConstraintProvider;
 import ai.timefold.solver.core.config.score.director.ScoreDirectorFactoryConfig;
 import ai.timefold.solver.core.config.solver.EnvironmentMode;
 import ai.timefold.solver.core.config.util.ConfigUtils;
-import ai.timefold.solver.core.enterprise.TimefoldSolverEnterpriseService;
+import ai.timefold.solver.core.extension.TimefoldSolverExtensionService;
 import ai.timefold.solver.core.impl.domain.solution.descriptor.SolutionDescriptor;
 import ai.timefold.solver.core.impl.domain.variable.declarative.ConsistencyTracker;
 import ai.timefold.solver.core.impl.score.constraint.ConstraintMatchPolicy;
@@ -44,9 +44,8 @@ public final class BavetConstraintStreamScoreDirectorFactory<Solution_, Score_ e
     private static Class<? extends ConstraintProvider> getConstraintProviderClass(ScoreDirectorFactoryConfig config,
             Class<? extends ConstraintProvider> providedConstraintProviderClass) {
         if (Boolean.TRUE.equals(config.getConstraintStreamAutomaticNodeSharing())) {
-            var enterpriseService =
-                    TimefoldSolverEnterpriseService.loadOrFail(TimefoldSolverEnterpriseService.Feature.AUTOMATIC_NODE_SHARING);
-            return enterpriseService.buildLambdaSharedConstraintProvider(config.getConstraintProviderClass());
+            var extensionService = TimefoldSolverExtensionService.load();
+            return extensionService.buildLambdaSharedConstraintProvider(config.getConstraintProviderClass());
         } else {
             return providedConstraintProviderClass;
         }
