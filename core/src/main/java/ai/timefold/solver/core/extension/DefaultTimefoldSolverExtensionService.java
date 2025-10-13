@@ -1,5 +1,7 @@
 package ai.timefold.solver.core.extension;
 
+import java.util.function.BiFunction;
+
 import ai.timefold.solver.core.api.score.stream.ConstraintProvider;
 import ai.timefold.solver.core.config.heuristic.selector.common.SelectionCacheType;
 import ai.timefold.solver.core.config.heuristic.selector.common.SelectionOrder;
@@ -29,11 +31,10 @@ import ai.timefold.solver.core.impl.move.MoveRepository;
 import ai.timefold.solver.core.impl.partitionedsearch.PartitionedSearchPhase;
 import ai.timefold.solver.core.impl.solver.termination.PhaseTermination;
 import ai.timefold.solver.core.impl.solver.termination.SolverTermination;
+import ai.timefold.solver.core.impl.solver.thread.ChildThreadType;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.function.BiFunction;
 
 public class DefaultTimefoldSolverExtensionService implements TimefoldSolverExtensionService {
 
@@ -56,9 +57,21 @@ public class DefaultTimefoldSolverExtensionService implements TimefoldSolverExte
             PhaseTermination<Solution_> termination,
             ConstructionHeuristicForager<Solution_> forager,
             HeuristicConfigPolicy<Solution_> configPolicy) {
-        // Stub implementation: ignore multi-threading and return single-threaded decider
-        LOGGER.debug("Multi-threaded construction heuristic requested but using single-threaded implementation in Community Edition");
-        return new ConstructionHeuristicDecider<>(configPolicy.getLogIndentation(), termination, forager);
+        var moveThreadCount = configPolicy.getMoveThreadCount();
+        if (moveThreadCount != null && moveThreadCount > 1) {
+            LOGGER.info("Using multithreaded construction heuristic with {} threads in Community Edition", moveThreadCount);
+            var threadFactory = configPolicy.buildThreadFactory(ChildThreadType.MOVE_THREAD);
+            return new MultithreadedConstructionHeuristicDecider<>(
+                    configPolicy.getLogIndentation(),
+                    termination,
+                    forager,
+                    moveThreadCount,
+                    threadFactory,
+                    configPolicy.getEnvironmentMode());
+        } else {
+            // Single-threaded fallback
+            return new ConstructionHeuristicDecider<>(configPolicy.getLogIndentation(), termination, forager);
+        }
     }
 
     @Override
@@ -69,11 +82,22 @@ public class DefaultTimefoldSolverExtensionService implements TimefoldSolverExte
             LocalSearchForager<Solution_> forager,
             EnvironmentMode environmentMode,
             HeuristicConfigPolicy<Solution_> configPolicy) {
-        // Stub implementation: ignore moveThreadCount and return single-threaded decider
         if (moveThreadCount > 1) {
-            LOGGER.debug("Multi-threaded local search with {} threads requested but using single-threaded implementation in Community Edition", moveThreadCount);
+            LOGGER.info("Using multithreaded local search with {} threads in Community Edition", moveThreadCount);
+            var threadFactory = configPolicy.buildThreadFactory(ChildThreadType.MOVE_THREAD);
+            return new MultithreadedLocalSearchDecider<>(
+                    configPolicy.getLogIndentation(),
+                    termination,
+                    moveRepository,
+                    acceptor,
+                    forager,
+                    moveThreadCount,
+                    threadFactory,
+                    environmentMode);
+        } else {
+            // Single-threaded fallback
+            return new LocalSearchDecider<>(configPolicy.getLogIndentation(), termination, moveRepository, acceptor, forager);
         }
-        return new LocalSearchDecider<>(configPolicy.getLogIndentation(), termination, moveRepository, acceptor, forager);
     }
 
     @Override
@@ -85,7 +109,7 @@ public class DefaultTimefoldSolverExtensionService implements TimefoldSolverExte
         // TODO: Implement stub partitioned search that creates a single partition
         throw new UnsupportedOperationException(
                 "Partitioned search is not yet implemented in Community Edition. " +
-                "This is a stub implementation that will be enhanced in future versions.");
+                        "This is a stub implementation that will be enhanced in future versions.");
     }
 
     @Override
